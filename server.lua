@@ -163,7 +163,7 @@ QBCore.Functions.CreateCallback('qb-banking:server:openBank', function(source, c
     local statements = {}
     if job.name ~= 'unemployed' and not Accounts[job.name] then CreateJobAccount(job.name, 0) end
     if gang.name ~= 'none' and not Accounts[gang.name] then CreateGangAccount(gang.name, 0) end
-    accounts[#accounts + 1] = { account_name = 'checking', account_type = 'checking', account_balance = Player.PlayerData.money.bank }
+    accounts[#accounts + 1] = { account_name = 'checking', account_type = 'checking', account_balance = Player.Functions.GetMoney('bank')}
     statements['checking'] = Statements[citizenid] and Statements[citizenid]['checking'] or {}
     for accountName, accountInfo in pairs(Accounts) do
         if accountInfo.citizenid == citizenid then
@@ -179,6 +179,7 @@ QBCore.Functions.CreateCallback('qb-banking:server:openBank', function(source, c
             if Statements[accountName] then statements[accountName] = Statements[accountName] end
         end
     end
+    Player.PlayerData.money.cash = Player.Functions.GetMoney('cash') 
     cb(accounts, statements, Player.PlayerData)
 end)
 
@@ -245,7 +246,7 @@ QBCore.Functions.CreateCallback('qb-banking:server:deposit', function(source, cb
     local depositAmount = tonumber(data.amount)
     local reason = (data.reason ~= '' and data.reason) or 'Bank Deposit'
     if accountName == 'checking' then
-        local accountBalance = Player.PlayerData.money.cash
+        local accountBalance = Player.Functions.GetMoney('cash')
         if accountBalance < depositAmount then return cb({ success = false, message = Lang:t('error.money') }) end
         Player.Functions.RemoveMoney('cash', depositAmount, 'bank deposit')
         Player.Functions.AddMoney('bank', depositAmount, 'bank deposit')
